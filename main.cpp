@@ -1,7 +1,11 @@
 #include <iostream>
+#include "Matrix.hpp"
 
 int main()
 {
-    std::cout << sizeof(size_t);
-    return 0;
+    MyMatrix::Matrix jason {10, 10};
+    jason.populate();
+    std::cout << jason;
+    jason.transpose();
+    std::cout << jason;
 }
