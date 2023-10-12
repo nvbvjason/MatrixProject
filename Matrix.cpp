@@ -11,35 +11,37 @@ namespace MyMatrix {
         }
     }
 
-    Matrix& Matrix::operator+(const Matrix& other)
+    Matrix Matrix::operator+(const Matrix& other) const
     {
         if (row_count != other.rows() || column_count != other.columns())
             throw std::runtime_error("must be of equal size");
+        Matrix Mat{row_count,column_count};
         for (size_t row = 0; row < row_count; row++) {
             for (size_t column = 0; column < column_count; column++) {
-                elem[row][column] += other[row][column];
+                Mat[row][column] = elem[row][column] + other[row][column];
             }
         }
-        return *this;
+        return Mat;
     }
 
-    Matrix& Matrix::operator-(const Matrix& other)
+    Matrix Matrix::operator-(const Matrix& other) const
     {
         if (row_count != other.rows() || column_count != other.columns())
             throw std::runtime_error("must be of equal size");
+        Matrix Mat {row_count, column_count};
         for (size_t row = 0; row < row_count; row++) {
             for (size_t column = 0; column < column_count; column++) {
-                elem[row][column] -= other[row][column];
+                Mat[row][column] = elem[row][column] - other[row][column];
             }
         }
-        return *this;
+        return Mat;
     }
 
-    Matrix& Matrix::operator*(const Matrix& other)
+    Matrix Matrix::operator*(const Matrix& other) const
     {
         if (column_count != other.rows())
             throw std::runtime_error("row first must be equal to column count other");
-        Matrix result = *new Matrix {row_count, other.columns()};
+        Matrix result {row_count, other.columns()};
         for (size_t i = 0; i < row_count; i++) {
             for (size_t k = 0; k < other.columns(); k++) {
                 double temp = 0;
@@ -106,7 +108,7 @@ namespace MyMatrix {
                 elem[column][row] = temp;
             }
         }
-    };
+    }
 
     Matrix::~Matrix()
     {

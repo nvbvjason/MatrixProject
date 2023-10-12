@@ -21,9 +21,9 @@ namespace MyMatrix{
         double* operator[](size_t row) { return elem[row]; }
         const double* operator[](size_t row) const { return elem[row]; }
 
-        Matrix& operator+(const Matrix& other);
-        Matrix& operator-(const Matrix& other);
-        Matrix& operator*(const Matrix& other);
+        Matrix operator+(const Matrix& other) const;
+        Matrix operator-(const Matrix& other) const;
+        Matrix operator*(const Matrix& other) const;
 
         void identity();
         void populate_random();
