@@ -7,6 +7,8 @@
 #include <cstddef>
 #include <random>
 #include <iostream>
+#include <vector>
+#include <cassert>
 
 namespace MyMatrix {
 
@@ -17,6 +19,7 @@ namespace MyMatrix {
         size_t column_count;
     public:
         explicit Matrix(size_t rows = 1, size_t columns = 1);
+        Matrix(const Matrix& other);
 
         [[nodiscard]] size_t rows() const { return row_count; }
         [[nodiscard]] size_t columns() const { return column_count; }
@@ -24,6 +27,8 @@ namespace MyMatrix {
         const double* operator[](size_t index) const { return row(index); }
 
         Matrix& operator=(const Matrix& other);
+        Matrix& operator+=(const Matrix& other);
+        Matrix& operator-=(const Matrix& other);
 
         Matrix operator+(const Matrix& other) const;
         Matrix operator-(const Matrix& other) const;
@@ -34,10 +39,14 @@ namespace MyMatrix {
         void populate_sym();
         void populate();
         void transpose();
+        void Gauss();
+
         ~Matrix() { delete[]elem; }
     private:
         double* row(size_t index) { return elem + column_count * index; }
         [[nodiscard]] const double* row(size_t index) const { return elem + column_count * index; }
+
+        void swap_rows(size_t first, size_t second);
     };
 
     std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
