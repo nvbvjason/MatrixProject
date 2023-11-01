@@ -9,7 +9,7 @@ namespace MyMatrix {
         assert(rows != 0 && columns != 0);
     }
 
-    Matrix::Matrix(const MyMatrix::Matrix& other)
+    Matrix::Matrix(const Matrix& other)
             : row_count{other.rows()}, column_count{other.columns()}, elem{new double[other.rows() * other.columns()]}
     {
         for (size_t row = 0; row < row_count; row++) {
@@ -17,6 +17,25 @@ namespace MyMatrix {
                 (*this)[row][column] = other[row][column];
             }
         }
+    }
+
+    Matrix::Matrix(Matrix&& other) noexcept
+            : row_count{other.rows()}, column_count{other.columns()}
+    {
+        delete[] elem;
+        elem = other.get_matrix();
+        other.set_elem(nullptr);
+        other.set_rows(0);
+        other.set_columns(0);
+    }
+
+    double Matrix::at(size_t row, size_t column)
+    {
+        if (row <= 0 || row_count + 1 < row)
+            throw std::invalid_argument("row out of range");
+        if (column <= 0 || column_count + 1 < column)
+            throw std::invalid_argument("row out of range");
+        return (*this)[row][column];
     }
 
     Matrix& Matrix::operator=(const MyMatrix::Matrix& other)
@@ -32,6 +51,20 @@ namespace MyMatrix {
                 (*this)[row][column] = other[row][column];
             }
         }
+        return *this;
+    }
+
+    Matrix& Matrix::operator=(MyMatrix::Matrix&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+        row_count = other.rows();
+        column_count = other.columns();
+        delete[] elem;
+        elem = other.get_matrix();
+        other.set_elem(nullptr);
+        other.set_rows(0);
+        other.set_columns(0);
         return *this;
     }
 
@@ -59,26 +92,14 @@ namespace MyMatrix {
 
     Matrix Matrix::operator+(const Matrix& other) const
     {
-        assert(row_count == other.rows() && column_count == other.columns());
-        Matrix Mat{row_count, column_count};
-        for (size_t row = 0; row < row_count; row++) {
-            for (size_t column = 0; column < column_count; column++) {
-                Mat[row][column] = (*this)[row][column] + other[row][column];
-            }
-        }
-        return Mat;
+        Matrix result = *this;
+        return result += other;
     }
 
     Matrix Matrix::operator-(const Matrix& other) const
     {
-        assert(row_count == other.rows() && column_count == other.columns());
-        Matrix Mat{row_count, column_count};
-        for (size_t row = 0; row < row_count; row++) {
-            for (size_t column = 0; column < column_count; column++) {
-                Mat[row][column] = (*this)[row][column] - other[row][column];
-            }
-        }
-        return Mat;
+        Matrix result = *this;
+        return result -= other;
     }
 
     Matrix Matrix::operator*(const Matrix& other) const
@@ -95,6 +116,17 @@ namespace MyMatrix {
             }
         }
         return result;
+    }
+
+    Matrix Matrix::operator*(const double scala) const
+    {
+        Matrix* result = new Matrix{*this};
+        for (size_t row = 0; row < row_count; row++) {
+            for (size_t column = 0; column < column_count; column++) {
+                *result[row][column] *= scala;
+            }
+        }
+        return *result;
     }
 
     void Matrix::identity()
@@ -141,15 +173,27 @@ namespace MyMatrix {
 
     void Matrix::transpose()
     {
-
-        assert(row_count == column_count);
-        for (size_t row = 0; row < row_count - 1; row++) {
-            for (size_t column = row + 1; column < column_count; column++) {
-                double temp = (*this)[row][column];
-                (*this)[row][column] = (*this)[row][column];
-                (*this)[row][column] = temp;
+        if (row_count == column_count) {
+            for (size_t row = 0; row < row_count - 1; row++) {
+                for (size_t column = row + 1; column < column_count; column++) {
+                    double temp = (*this)[column][row];
+                    (*this)[column][row] = (*this)[row][column];
+                    (*this)[row][column] = temp;
+                }
+            }
+            return;
+        }
+        Matrix* result = new Matrix{column_count, row_count};
+        for (size_t row = 0; row < result->rows() - 1; row++) {
+            for (size_t column = 0; column < result->columns(); column++) {
+                (*result)[row][column] = (*this)[column][row];
             }
         }
+        delete[] elem;
+        row_count = result->rows();
+        column_count = result->columns();
+        elem = result->get_matrix();
+        result->~Matrix();
     }
 
     void Matrix::Gauss()

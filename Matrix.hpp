@@ -20,19 +20,29 @@ namespace MyMatrix {
     public:
         explicit Matrix(size_t rows = 1, size_t columns = 1);
         Matrix(const Matrix& other);
+        Matrix(Matrix&& other) noexcept;
 
         [[nodiscard]] size_t rows() const { return row_count; }
         [[nodiscard]] size_t columns() const { return column_count; }
+        double* get_matrix() { return elem; }
         double* operator[](size_t index) { return row(index); }
         const double* operator[](size_t index) const { return row(index); }
+        double operator()(size_t row, size_t column) { return (*this)[row][column]; }
+        double at(size_t row, size_t column);
 
         Matrix& operator=(const Matrix& other);
+        Matrix& operator=(Matrix&& other) noexcept;
         Matrix& operator+=(const Matrix& other);
         Matrix& operator-=(const Matrix& other);
 
         Matrix operator+(const Matrix& other) const;
         Matrix operator-(const Matrix& other) const;
         Matrix operator*(const Matrix& other) const;
+        Matrix operator*(double scala) const;
+
+        void set_rows(size_t rows) { row_count = rows; }
+        void set_columns(size_t columns) { column_count = columns; }
+        void set_elem(double* ptr) { elem = ptr; }
 
         void identity();
         void populate_random();
