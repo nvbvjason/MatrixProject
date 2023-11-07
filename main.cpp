@@ -3,7 +3,9 @@
 
 int main()
 {
-    MyMatrix::Matrix jason {10, 10};
-    jason.populate();
-    std::cout << jason;
+    auto* jason = new MyMatrix::Matrix{10, 10, 5};
+    auto* la = new MyMatrix::Matrix{10, 10, 5};
+    auto* bla = new MyMatrix::Matrix{10, 10, 0};
+    *bla = *jason * *la;
+    std::cout << *bla;
 }
