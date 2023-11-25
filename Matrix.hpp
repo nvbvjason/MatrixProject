@@ -14,9 +14,9 @@ namespace MyMatrix {
 
 class Matrix {
     // DATA
-    double* elem;
     size_t row_count;
     size_t column_count;
+    double* elem;
 public:
     // CREATORS
     explicit Matrix(size_t rows = 1, size_t columns = 1);

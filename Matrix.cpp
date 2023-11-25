@@ -29,7 +29,6 @@ Matrix::Matrix(const Matrix& other)
 Matrix::Matrix(Matrix&& other) noexcept
         : row_count{other.rows()}, column_count{other.columns()}
 {
-    delete[] elem;
     elem = other.get_matrix();
     other.set_elem(nullptr);
     other.set_rows(0);
@@ -45,7 +44,7 @@ double Matrix::at(size_t row, size_t column) const
     return (*this)[row][column];
 }
 
-Matrix& Matrix::operator=(const MyMatrix::Matrix& other)
+Matrix& Matrix::operator=(const Matrix& other)
 {
     if (this == &other)
         return *this;
@@ -75,7 +74,7 @@ Matrix& Matrix::operator=(MyMatrix::Matrix&& other) noexcept
     return *this;
 }
 
-Matrix& Matrix::operator+=(const MyMatrix::Matrix& other)
+Matrix& Matrix::operator+=(const Matrix& other)
 {
     assert(row_count == other.rows());
     assert(column_count == other.columns());
@@ -85,7 +84,7 @@ Matrix& Matrix::operator+=(const MyMatrix::Matrix& other)
     return *this;
 }
 
-Matrix& Matrix::operator-=(const MyMatrix::Matrix& other)
+Matrix& Matrix::operator-=(const Matrix& other)
 {
     assert(row_count == other.rows());
     assert(column_count == other.columns());
@@ -95,7 +94,7 @@ Matrix& Matrix::operator-=(const MyMatrix::Matrix& other)
     return *this;
 }
 
-Matrix& Matrix::operator*=(const MyMatrix::Matrix& other)
+Matrix& Matrix::operator*=(const Matrix& other)
 {
     assert(column_count == other.rows());
     auto* result = new Matrix{row_count, other.columns(), 0.0};
@@ -155,29 +154,23 @@ void Matrix::populate_random()
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_real_distribution<double> dist(-10, 10.0);
-    for (size_t row = 0; row < row_count; row++) {
-        for (size_t column = 0; column < column_count; column++) {
+    for (size_t row = 0; row < row_count; row++)
+        for (size_t column = 0; column < column_count; column++)
             (*this)[row][column] = dist(mt);
-        }
-    }
 }
 
 void Matrix::populate_sym()
 {
-    for (size_t row = 0; row < row_count; row++) {
-        for (size_t column = 0; column < column_count; column++) {
+    for (size_t row = 0; row < row_count; row++)
+        for (size_t column = 0; column < column_count; column++)
             (*this)[row][column] = (row + 1) + column;
-        }
-    }
 }
 
 void Matrix::populate()
 {
-    for (size_t row = 0; row < row_count; row++) {
-        for (size_t column = 0; column < column_count; column++) {
+    for (size_t row = 0; row < row_count; row++)
+        for (size_t column = 0; column < column_count; column++)
             (*this)[row][column] = (row + 1) + (column * column_count);
-        }
-    }
 }
 
 void Matrix::transpose()
@@ -185,7 +178,7 @@ void Matrix::transpose()
     if (row_count == column_count) {
         for (size_t row = 0; row < row_count - 1; row++) {
             for (size_t column = row + 1; column < column_count; column++) {
-                double temp = (*this)[column][row];
+                const double temp = (*this)[column][row];
                 (*this)[column][row] = (*this)[row][column];
                 (*this)[row][column] = temp;
             }
@@ -205,7 +198,7 @@ void Matrix::transpose()
 
 void Matrix::Gauss()
 {
-    size_t height = row_count;
+    const size_t height = row_count;
     for (size_t k = 0; k < column_count; k++) {
 
         std::vector<std::vector<size_t>> to_sort;
@@ -272,10 +265,9 @@ bool operator==(const Matrix& a, const Matrix& b)
     if (a.rows() != b.rows() || a.columns() != b.columns())
         return false;
     for (size_t row = 0; row < a.rows() - 1; row++)
-        for (size_t column = 0; column < a.columns(); column++) {
+        for (size_t column = 0; column < a.columns(); column++)
             if (a[row][column] != b[column][row])
                 return false;
-        }
     return true;
 }
 
