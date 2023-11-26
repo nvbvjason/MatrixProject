@@ -1,5 +1,8 @@
-#include <vector>
 #include "Matrix.hpp"
+#include <vector>
+#include <cassert>
+#include <stdexcept>
+
 
 namespace MyMatrix {
 
@@ -163,14 +166,14 @@ void Matrix::populate_sym()
 {
     for (size_t row = 0; row < row_count; row++)
         for (size_t column = 0; column < column_count; column++)
-            (*this)[row][column] = (row + 1) + column;
+            (*this)[row][column] = static_cast<double>(row + 1 + column);
 }
 
 void Matrix::populate()
 {
     for (size_t row = 0; row < row_count; row++)
         for (size_t column = 0; column < column_count; column++)
-            (*this)[row][column] = (row + 1) + (column * column_count);
+            (*this)[row][column] = static_cast<double>(row + 1 + column * column_count);
 }
 
 void Matrix::transpose()
