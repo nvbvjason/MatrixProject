@@ -4,7 +4,7 @@
 #define MATRIXPROJECT_MATRIX_HPP
 
 #include <cstdint>
-#include <random>
+#include <ostream>
 
 namespace MyMatrix {
 

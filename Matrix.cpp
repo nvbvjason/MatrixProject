@@ -3,7 +3,7 @@
 #include <vector>
 #include <cassert>
 #include <stdexcept>
-#include <ostream>
+#include <random>
 
 namespace MyMatrix {
 
