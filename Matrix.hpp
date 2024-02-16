@@ -3,25 +3,22 @@
 #ifndef MATRIXPROJECT_MATRIX_HPP
 #define MATRIXPROJECT_MATRIX_HPP
 
-#include <cstddef>
+#include <cstdint>
 #include <random>
-#include <iostream>
-
 
 namespace MyMatrix {
 
 class Matrix {
     // DATA
-    size_t row_count;
-    size_t column_count;
-    double* elem;
+    int32_t m_rows;
+    int32_t m_columns;
+    double* m_elem;
 public:
     // CREATORS
-    explicit Matrix(size_t rows = 1, size_t columns = 1);
-    Matrix(size_t rows, size_t columns, double value);
+    Matrix(int32_t rows, int32_t columns, bool is_identity = false);
     Matrix(const Matrix& other);
     Matrix(Matrix&& other) noexcept;
-    ~Matrix() { delete[]elem; }
+    ~Matrix() { delete[]m_elem; }
 
     // MANIPULATORS
     Matrix& operator=(const Matrix& other);
@@ -29,30 +26,27 @@ public:
     Matrix& operator+=(const Matrix& other);
     Matrix& operator-=(const Matrix& other);
     Matrix& operator*=(const Matrix& other);
-    Matrix operator+(const Matrix& other) const;
-    Matrix operator-(const Matrix& other) const;
-    Matrix operator*(const Matrix& other) const;
-    Matrix operator*(double scala) const;
     void identity();
-    void populate_random();
+    void populate_random(double low, double high);
     void populate_sym();
     void populate();
     void transpose();
     void Gauss();
 
     // ACCESSORS
-    [[nodiscard]] size_t rows() const { return row_count; }
-    [[nodiscard]] size_t columns() const { return column_count; }
-    [[nodiscard]] double at(size_t row, size_t column) const;
-    double* get_matrix() { return elem; }
-    double* operator[](size_t index) { return elem + column_count * index; }
-    const double* operator[](size_t index) const { return elem + column_count * index; }
-    double operator()(size_t row, size_t column) { return (*this)[row][column]; }
+    Matrix operator+(const Matrix& other) const;
+    Matrix operator-(const Matrix& other) const;
+    Matrix operator*(const Matrix& other) const;
+    Matrix operator*(double scala) const;
+    [[nodiscard]] int32_t rows() const { return m_rows; }
+    [[nodiscard]] int32_t columns() const { return m_columns; }
+    [[nodiscard]] double at(int32_t row, int32_t column) const;
+    [[nodiscard]] double* get_matrix() const { return m_elem; }
+    double* operator[](const int32_t index) { return m_elem + m_columns * index; }
+    const double* operator[](int32_t index) const { return m_elem + m_columns * index; }
+    double operator()(const int32_t row, const int32_t column) { return (*this)[row][column]; }
 private:
-    void set_rows(size_t rows) { row_count = rows; }
-    void set_columns(size_t columns) { column_count = columns; }
-    void set_elem(double* ptr) { elem = ptr; }
-    void swap_rows(size_t first, size_t second);
+    void swap_rows(int32_t first, int32_t second);
 };
 
 std::ostream& operator<<(std::ostream& os, const Matrix& matrix);

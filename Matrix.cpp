@@ -1,48 +1,50 @@
 #include "Matrix.hpp"
+
 #include <vector>
 #include <cassert>
 #include <stdexcept>
-
+#include <ostream>
 
 namespace MyMatrix {
 
-Matrix::Matrix(size_t rows, size_t columns)
-        : row_count{rows}, column_count{columns}, elem{new double[rows * columns]}
+Matrix::Matrix(const int32_t rows, const int32_t columns, const bool is_identity)
+        : m_rows{rows}, m_columns{columns}, m_elem{new double[rows * columns]}
 {
     assert(0 < rows && 0 < columns);
-}
+    if (is_identity) {
+        for (int32_t row = 0; row < rows; ++row)
+            for (int32_t col = 0; col < columns; ++col) {
+                if (row == col)
+                    (*this)[row][col] = 1;
+                else
+                    (*this)[row][col] = 0;
 
-Matrix::Matrix(size_t rows, size_t columns, double value)
-        : row_count{rows}, column_count{columns}, elem{new double[rows * columns]}
-{
-    assert(0 < rows && 0 < columns);
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
-            (*this)[row][column] = value;
+            }
+    }
 }
 
 Matrix::Matrix(const Matrix& other)
-        : row_count{other.rows()}, column_count{other.columns()}, elem{new double[other.rows() * other.columns()]}
+        : m_rows{other.m_rows}, m_columns{other.m_columns}, m_elem{new double[other.rows() * other.columns()]}
 {
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] = other[row][column];
 }
 
 Matrix::Matrix(Matrix&& other) noexcept
-        : row_count{other.rows()}, column_count{other.columns()}
+        : m_rows{other.rows()}, m_columns{other.columns()}
 {
-    elem = other.get_matrix();
-    other.set_elem(nullptr);
-    other.set_rows(0);
-    other.set_columns(0);
+    m_elem = other.get_matrix();
+    other.m_elem = nullptr;
+    other.m_rows = 0;
+    other.m_columns = 0;
 }
 
-double Matrix::at(size_t row, size_t column) const
+double Matrix::at(const int32_t row, const int32_t column) const
 {
-    if (row <= 0 || row_count + 1 < row)
+    if (row <= 0 || m_rows + 1 < row)
         throw std::invalid_argument("row out of range");
-    if (column <= 0 || column_count + 1 < column)
+    if (column <= 0 || m_columns + 1 < column)
         throw std::invalid_argument("row out of range");
     return (*this)[row][column];
 }
@@ -51,64 +53,64 @@ Matrix& Matrix::operator=(const Matrix& other)
 {
     if (this == &other)
         return *this;
-    if (row_count != other.rows() || column_count != other.columns()) {
-        row_count = other.rows();
-        column_count = other.columns();
-        delete[] elem;
-        elem = new double[row_count * column_count];
+    if (m_rows != other.rows() || m_columns != other.columns()) {
+        m_rows = other.rows();
+        m_columns = other.columns();
+        delete[] m_elem;
+        m_elem = new double[m_rows * m_columns];
     }
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] = other[row][column];
     return *this;
 }
 
-Matrix& Matrix::operator=(MyMatrix::Matrix&& other) noexcept
+Matrix& Matrix::operator=(Matrix&& other) noexcept
 {
     if (this == &other)
         return *this;
-    row_count = other.rows();
-    column_count = other.columns();
-    delete[] elem;
-    elem = other.get_matrix();
-    other.set_elem(nullptr);
-    other.set_rows(0);
-    other.set_columns(0);
+    m_rows = other.rows();
+    m_columns = other.columns();
+    delete[] m_elem;
+    m_elem = other.get_matrix();
+    other.m_elem = nullptr;
+    other.m_rows = 0;
+    other.m_columns = 0;
     return *this;
 }
 
 Matrix& Matrix::operator+=(const Matrix& other)
 {
-    assert(row_count == other.rows());
-    assert(column_count == other.columns());
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
+    assert(m_rows == other.rows());
+    assert(m_columns == other.columns());
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] += other[row][column];
     return *this;
 }
 
 Matrix& Matrix::operator-=(const Matrix& other)
 {
-    assert(row_count == other.rows());
-    assert(column_count == other.columns());
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
+    assert(m_rows == other.rows());
+    assert(m_columns == other.columns());
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] -= other[row][column];
     return *this;
 }
 
 Matrix& Matrix::operator*=(const Matrix& other)
 {
-    assert(column_count == other.rows());
-    auto* result = new Matrix{row_count, other.columns(), 0.0};
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < other.columns(); column++)
-            for (size_t j = 0; j < column_count; j++)
+    assert(m_columns == other.rows());
+    auto* result = new Matrix{m_rows, other.columns()};
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < other.columns(); column++)
+            for (int32_t j = 0; j < m_columns; j++)
                 (*result)[row][column] += (*this)[row][j] * other[j][column];
-    column_count = other.columns();
-    delete[] elem;
-    elem = result->elem;
-    result->elem = nullptr;
+    m_columns = other.columns();
+    delete[] m_elem;
+    m_elem = result->m_elem;
+    result->m_elem = nullptr;
     result->~Matrix();
     return *this;
 }
@@ -131,19 +133,19 @@ Matrix Matrix::operator*(const Matrix& other) const
     return result *= other;
 }
 
-Matrix Matrix::operator*(const double scalar) const
+Matrix Matrix::operator*(const double scala) const
 {
     auto* result = new Matrix{*this};
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
-            *result[row][column] *= scalar;
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
+            *result[row][column] *= scala;
     return *result;
 }
 
 void Matrix::identity()
 {
-    for (size_t row = 0; row < row_count; row++) {
-        for (size_t column = 0; column < column_count; column++) {
+    for (int32_t row = 0; row < m_rows; row++) {
+        for (int32_t column = 0; column < m_columns; column++) {
             if (row == column)
                 (*this)[row][column] = 1;
             else
@@ -152,35 +154,35 @@ void Matrix::identity()
     }
 }
 
-void Matrix::populate_random()
+void Matrix::populate_random(const double low, const double high)
 {
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_real_distribution<double> dist(-10, 10.0);
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
+    std::uniform_real_distribution<double> dist(low, high);
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] = dist(mt);
 }
 
 void Matrix::populate_sym()
 {
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] = static_cast<double>(row + 1 + column);
 }
 
 void Matrix::populate()
 {
-    for (size_t row = 0; row < row_count; row++)
-        for (size_t column = 0; column < column_count; column++)
-            (*this)[row][column] = static_cast<double>(row + 1 + column * column_count);
+    for (int32_t row = 0; row < m_rows; row++)
+        for (int32_t column = 0; column < m_columns; column++)
+            (*this)[row][column] = static_cast<double>(row + 1 + column * m_columns);
 }
 
 void Matrix::transpose()
 {
-    if (row_count == column_count) {
-        for (size_t row = 0; row < row_count - 1; row++) {
-            for (size_t column = row + 1; column < column_count; column++) {
+    if (m_rows == m_columns) {
+        for (int32_t row = 0; row < m_rows - 1; row++) {
+            for (int32_t column = row + 1; column < m_columns; column++) {
                 const double temp = (*this)[column][row];
                 (*this)[column][row] = (*this)[row][column];
                 (*this)[row][column] = temp;
@@ -188,29 +190,29 @@ void Matrix::transpose()
         }
         return;
     }
-    auto* result = new Matrix{column_count, row_count};
-    for (size_t row = 0; row < result->rows() - 1; row++)
-        for (size_t column = 0; column < result->columns(); column++)
+    auto* result = new Matrix{m_columns, m_rows};
+    for (int32_t row = 0; row < result->rows() - 1; row++)
+        for (int32_t column = 0; column < result->columns(); column++)
             (*result)[row][column] = (*this)[column][row];
-    delete[] elem;
-    row_count = result->rows();
-    column_count = result->columns();
-    elem = result->get_matrix();
+    delete[] m_elem;
+    m_rows = result->rows();
+    m_columns = result->columns();
+    m_elem = result->get_matrix();
     result->~Matrix();
 }
 
 void Matrix::Gauss()
 {
-    const size_t height = row_count;
-    for (size_t k = 0; k < column_count; k++) {
+    const int32_t height = m_rows;
+    for (int32_t k = 0; k < m_columns; k++) {
 
         std::vector<std::vector<size_t>> to_sort;
         std::vector<size_t> temp_vi;
 
         // count how many 0 start each row
-        for (size_t row = k; row < height; row++) {
-            int counter = 0;
-            for (size_t column = 0; column < height; column++) {
+        for (int32_t row = k; row < height; row++) {
+            int32_t counter = 0;
+            for (int32_t column = 0; column < height; column++) {
                 if ((*this)[row][column] == 0)
                     counter++;
                 else
@@ -237,14 +239,14 @@ void Matrix::Gauss()
     }
 }
 
-void Matrix::swap_rows(size_t first, size_t second)
+void Matrix::swap_rows(const int32_t first, const int32_t second)
 {
-    auto* temp = new double[column_count];
-    for (size_t column = 0; column < column_count; column++)
+    auto* temp = new double[m_columns];
+    for (int32_t column = 0; column < m_columns; column++)
         temp[column] = (*this)[first][column];
-    for (size_t column = 0; column < column_count; column++)
+    for (int32_t column = 0; column < m_columns; column++)
         (*this)[first][column] = (*this)[second][column];
-    for (size_t column = 0; column < column_count; column++)
+    for (int32_t column = 0; column < m_columns; column++)
         (*this)[second][column] = temp[column];
     delete[] temp;
 }
@@ -252,8 +254,8 @@ void Matrix::swap_rows(size_t first, size_t second)
 std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
 {
     os << "-------------------------------------------------------------\n";
-    for (size_t row = 0; row < matrix.rows(); row++) {
-        for (size_t column = 0; column < matrix.columns(); column++)
+    for (int32_t row = 0; row < matrix.rows(); row++) {
+        for (int32_t column = 0; column < matrix.columns(); column++)
             os << matrix[row][column] << '\t';
         os << '\n';
     }
@@ -267,8 +269,8 @@ bool operator==(const Matrix& a, const Matrix& b)
         return true;
     if (a.rows() != b.rows() || a.columns() != b.columns())
         return false;
-    for (size_t row = 0; row < a.rows() - 1; row++)
-        for (size_t column = 0; column < a.columns(); column++)
+    for (int32_t row = 0; row < a.rows() - 1; row++)
+        for (int32_t column = 0; column < a.columns(); column++)
             if (a[row][column] != b[column][row])
                 return false;
     return true;
