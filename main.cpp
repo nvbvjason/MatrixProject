@@ -3,9 +3,8 @@
 
 int main()
 {
-    auto* jason = new MyMatrix::Matrix{10, 10, 5};
-    auto* la = new MyMatrix::Matrix{10, 10, 5};
-    auto* bla = new MyMatrix::Matrix{10, 10, 0};
-    *bla = *jason * *la;
-    std::cout << *bla;
+    auto* jason = new MyMatrix::Matrix{10, 10, true};
+    jason->populate_random(0, 100);
+    jason->gauss();
+    std::cout << *jason;
 }
