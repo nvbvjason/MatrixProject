@@ -1,14 +1,13 @@
 #include "Matrix.hpp"
 
-#include <vector>
 #include <cassert>
+#include <iomanip>
 #include <stdexcept>
 #include <random>
 
 namespace MyMatrix {
-
 Matrix::Matrix(const int32_t rows, const int32_t columns, const bool is_identity)
-        : m_rows{rows}, m_columns{columns}, m_elem{new double[rows * columns]}
+    : m_rows{rows}, m_columns{columns}, m_elem{new double[rows * columns]}
 {
     assert(0 < rows && 0 < columns);
     if (is_identity) {
@@ -18,13 +17,12 @@ Matrix::Matrix(const int32_t rows, const int32_t columns, const bool is_identity
                     (*this)[row][col] = 1;
                 else
                     (*this)[row][col] = 0;
-
             }
     }
 }
 
 Matrix::Matrix(const Matrix& other)
-        : m_rows{other.m_rows}, m_columns{other.m_columns}, m_elem{new double[other.rows() * other.columns()]}
+    : m_rows{other.m_rows}, m_columns{other.m_columns}, m_elem{new double[other.rows() * other.columns()]}
 {
     for (int32_t row = 0; row < m_rows; row++)
         for (int32_t column = 0; column < m_columns; column++)
@@ -32,7 +30,7 @@ Matrix::Matrix(const Matrix& other)
 }
 
 Matrix::Matrix(Matrix&& other) noexcept
-        : m_rows{other.rows()}, m_columns{other.columns()}
+    : m_rows{other.rows()}, m_columns{other.columns()}
 {
     m_elem = other.get_matrix();
     other.m_elem = nullptr;
@@ -201,41 +199,36 @@ void Matrix::transpose()
     result->~Matrix();
 }
 
-void Matrix::Gauss()
+void Matrix::gauss()
 {
-    const int32_t height = m_rows;
-    for (int32_t k = 0; k < m_columns; k++) {
-
-        std::vector<std::vector<size_t>> to_sort;
-        std::vector<size_t> temp_vi;
-
-        // count how many 0 start each row
-        for (int32_t row = k; row < height; row++) {
-            int32_t counter = 0;
-            for (int32_t column = 0; column < height; column++) {
-                if ((*this)[row][column] == 0)
-                    counter++;
-                else
-                    break;
-            }
-            temp_vi.push_back(row);
-            temp_vi.push_back(counter);
-            to_sort.push_back(temp_vi);
-            temp_vi.clear();
+    for (int32_t i = 0; i < m_rows - 1; ++i) {
+        int32_t pivot = i;
+        double pivotsize = (*this)[i][i];
+        if (pivotsize < 0)
+            pivotsize = -pivotsize;
+        for (int32_t j = i + 1; j < m_rows; ++j) {
+            double temp = (*this)[j][i];
+            if (temp < 0)
+                temp = -temp;
+            if (pivotsize < temp)
+                pivot = j;
+            pivotsize = temp;
         }
-
-        // swap
-//        for (size_t i = k; i < to_sort.size(); i++) {
-//            bool swap = false;
-//            size_t size_t_temp = to_sort[i][i];
-//            size_t row_index_to_swap = 0;
-//            std::vector<double> to_swap;
-//            for (size_t j = i; j < to_sort.size(); j++) {
-//                if (to_sort[j][i] < size_t_temp) {
-//                    to_swap
-//                }
-//            }
-//        }
+        if (pivotsize == 0)
+            return;
+        if (pivot != i) {
+            for (int32_t j = 0; j < m_rows; ++j) {
+                const double temp = (*this)[i][j];
+                (*this)[i][j] = (*this)[pivot][j];
+                (*this)[pivot][j] = temp;
+            }
+        }
+        for (int32_t row = i + 1; row < m_rows; ++row) {
+            const double f = (*this)[row][i] / (*this)[i][i];
+            for (int32_t col = 0; col < m_rows; ++col)
+                (*this)[row][col] -= f * (*this)[i][col];
+            (*this)[row][i] = 0.0;
+        }
     }
 }
 
@@ -256,7 +249,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
     os << "-------------------------------------------------------------\n";
     for (int32_t row = 0; row < matrix.rows(); row++) {
         for (int32_t column = 0; column < matrix.columns(); column++)
-            os << matrix[row][column] << '\t';
+            os << std::setw(8) << std::setfill(' ') << std::fixed << std::setprecision(3) << matrix[row][column] << ' ';
         os << '\n';
     }
     os << "-------------------------------------------------------------\n";
@@ -280,5 +273,4 @@ bool operator!=(const Matrix& a, const Matrix& b)
 {
     return !(a == b);
 }
-
 }

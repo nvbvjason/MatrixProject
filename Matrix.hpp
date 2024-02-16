@@ -31,7 +31,7 @@ public:
     void populate_sym();
     void populate();
     void transpose();
-    void Gauss();
+    void gauss();
 
     // ACCESSORS
     Matrix operator+(const Matrix& other) const;
