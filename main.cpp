@@ -1,10 +1,14 @@
 #include <iostream>
+
+#include "Timer.hpp"
 #include "Matrix.hpp"
 
 int main()
 {
-    auto* jason = new MyMatrix::Matrix{10, 10, true};
-    jason->populate_random(0, 100);
-    jason->gauss();
-    std::cout << *jason;
+    int32_t size = 10;
+    auto* jason = new MyMatrix::Matrix{size, size};
+    auto* iden = new MyMatrix::Matrix{size, size};
+    jason->populate_random(0, size);
+    iden->populate_random(0, size);
+    *jason * *iden;
 }

@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <random>
+#include <cstring>
 
 namespace MyMatrix {
 Matrix::Matrix(const int32_t rows, const int32_t columns, const bool is_identity)
@@ -97,14 +98,16 @@ Matrix& Matrix::operator-=(const Matrix& other)
     return *this;
 }
 
+// change order for cachethrouput
 Matrix& Matrix::operator*=(const Matrix& other)
 {
     assert(m_columns == other.rows());
     auto* result = new Matrix{m_rows, other.columns()};
-    for (int32_t row = 0; row < m_rows; row++)
-        for (int32_t column = 0; column < other.columns(); column++)
-            for (int32_t j = 0; j < m_columns; j++)
-                (*result)[row][column] += (*this)[row][j] * other[j][column];
+    memset(result->m_elem, 0, sizeof(double) * m_rows * other.m_columns);
+    for (int32_t row = 0; row < m_rows; ++row)
+        for (int32_t i = 0; i < m_columns; ++i)
+            for (int32_t col = 0; col < other.m_columns; ++col)
+                (*result)[row][col] += (*this)[row][i] * other[i][col];
     m_columns = other.columns();
     delete[] m_elem;
     m_elem = result->m_elem;
@@ -193,9 +196,9 @@ void Matrix::transpose()
         for (int32_t column = 0; column < result->columns(); column++)
             (*result)[row][column] = (*this)[column][row];
     delete[] m_elem;
-    m_rows = result->rows();
-    m_columns = result->columns();
-    m_elem = result->get_matrix();
+    m_rows = result->m_rows;
+    m_columns = result->m_columns;
+    m_elem = result->m_elem;
     result->~Matrix();
 }
 
