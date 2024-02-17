@@ -10,7 +10,8 @@ namespace MyMatrix {
 Matrix::Matrix(const int32_t rows, const int32_t columns, const bool is_identity)
     : m_rows{rows}, m_columns{columns}, m_elem{new double[rows * columns]}
 {
-    assert(0 < rows && 0 < columns);
+    assert(0 < rows && "Matrix initialization row smaller zero");
+    assert(0 < columns && "Matrix initialization columns smaller zero");
     if (is_identity) {
         for (int32_t row = 0; row < rows; ++row)
             for (int32_t col = 0; col < columns; ++col) {
@@ -80,8 +81,8 @@ Matrix& Matrix::operator=(Matrix&& other) noexcept
 
 Matrix& Matrix::operator+=(const Matrix& other)
 {
-    assert(m_rows == other.rows());
-    assert(m_columns == other.columns());
+    assert(m_rows == other.m_rows && "Matrix addition different row count");
+    assert(m_columns == other.m_columns && "Matrix addition different column count");
     for (int32_t row = 0; row < m_rows; row++)
         for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] += other[row][column];
@@ -90,8 +91,8 @@ Matrix& Matrix::operator+=(const Matrix& other)
 
 Matrix& Matrix::operator-=(const Matrix& other)
 {
-    assert(m_rows == other.rows());
-    assert(m_columns == other.columns());
+    assert(m_rows == other.m_rows && "Matrix subtraction different row count");
+    assert(m_columns == other.m_columns && "Matrix subtraction different column count");
     for (int32_t row = 0; row < m_rows; row++)
         for (int32_t column = 0; column < m_columns; column++)
             (*this)[row][column] -= other[row][column];
@@ -101,7 +102,7 @@ Matrix& Matrix::operator-=(const Matrix& other)
 // change order for cachethrouput
 Matrix& Matrix::operator*=(const Matrix& other)
 {
-    assert(m_columns == other.rows());
+    assert(m_columns == other.m_rows && "Matrix multiplication unaligned");
     auto* result = new Matrix{m_rows, other.columns()};
     memset(result->m_elem, 0, sizeof(double) * m_rows * other.m_columns);
     for (int32_t row = 0; row < m_rows; ++row)
