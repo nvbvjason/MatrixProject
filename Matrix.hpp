@@ -26,6 +26,7 @@ public:
     Matrix& operator+=(const Matrix& other);
     Matrix& operator-=(const Matrix& other);
     Matrix& operator*=(const Matrix& other);
+    double* operator[](const int32_t index) { return m_elem + m_columns * index; }
     void identity();
     void populate_random(double low, double high);
     void populate_sym();
@@ -39,8 +40,7 @@ public:
     [[nodiscard]] int32_t columns() const { return m_columns; }
     [[nodiscard]] double at(int32_t row, int32_t column) const;
     [[nodiscard]] double* get_matrix() const { return m_elem; }
-    double* operator[](const int32_t index) { return m_elem + m_columns * index; }
-    const double* operator[](int32_t index) const { return m_elem + m_columns * index; }
+    [[nodiscard]] const double* operator[](int32_t index) const { return m_elem + m_columns * index; }
     double operator()(const int32_t row, const int32_t column) { return (*this)[row][column]; }
 private:
     void swap_rows(int32_t first, int32_t second);
