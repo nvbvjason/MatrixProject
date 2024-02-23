@@ -34,9 +34,6 @@ public:
     void gauss();
 
     // ACCESSORS
-    Matrix operator+(const Matrix& other) const;
-    Matrix operator-(const Matrix& other) const;
-    Matrix operator*(const Matrix& other) const;
     Matrix operator*(double scala) const;
     [[nodiscard]] int32_t rows() const { return m_rows; }
     [[nodiscard]] int32_t columns() const { return m_columns; }
@@ -48,6 +45,11 @@ public:
 private:
     void swap_rows(int32_t first, int32_t second);
 };
+
+Matrix operator+(const Matrix& other);
+Matrix operator-(const Matrix& other);
+Matrix operator*(const Matrix& other);
+
 
 std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
 bool operator==(const Matrix& a, const Matrix& b);

@@ -117,22 +117,22 @@ Matrix& Matrix::operator*=(const Matrix& other)
     return *this;
 }
 
-Matrix Matrix::operator+(const Matrix& other) const
+Matrix operator+(const Matrix& first, const Matrix& second)
 {
-    Matrix result = *this;
-    return result += other;
+    Matrix result = *first;
+    return result += second;
 }
 
-Matrix Matrix::operator-(const Matrix& other) const
+Matrix operator-(const Matrix& first, const Matrix& second)
 {
-    Matrix result = *this;
-    return result -= other;
+    Matrix result = *first;
+    return result -= second;
 }
 
-Matrix Matrix::operator*(const Matrix& other) const
+    Matrix operator*(const Matrix& first, const Matrix& second)
 {
-    Matrix result = *this;
-    return result *= other;
+    Matrix result = *first;
+    return result *= second;
 }
 
 Matrix Matrix::operator*(const double scala) const
