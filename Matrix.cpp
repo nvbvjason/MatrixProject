@@ -99,7 +99,6 @@ Matrix& Matrix::operator-=(const Matrix& other)
     return *this;
 }
 
-// change order for cachethrouput
 Matrix& Matrix::operator*=(const Matrix& other)
 {
     assert(m_columns == other.m_rows && "Matrix multiplication unaligned");

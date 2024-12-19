@@ -11,6 +11,6 @@ Timer::~Timer()
 {
     end = std::chrono::high_resolution_clock::now();
     duration = end -start;
-    double ms = duration.count() * 1000.0;
+    const double ms = duration.count() * 1000.0;
     std::cout << "Timer took " << ms << " ms " << '\n';
 }
