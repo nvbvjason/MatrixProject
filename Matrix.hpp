@@ -46,10 +46,10 @@ private:
     void swap_rows(int32_t first, int32_t second);
 };
 
-Matrix operator+(const Matrix& other);
-Matrix operator-(const Matrix& other);
-Matrix operator*(const Matrix& other);
 
+Matrix operator+(const Matrix& first, const Matrix& second);
+Matrix operator-(const Matrix& first, const Matrix& second);
+Matrix operator*(const Matrix& first, const Matrix& second);
 
 std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
 bool operator==(const Matrix& a, const Matrix& b);
